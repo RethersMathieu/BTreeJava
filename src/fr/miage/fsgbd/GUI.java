@@ -1,12 +1,13 @@
 package fr.miage.fsgbd;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultTreeModel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.io.File;
 
 /**
  * @author Galli Gregory, Mopolo Moke Gabriel
@@ -25,9 +26,9 @@ public class GUI extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == buttonLoad || e.getSource() == buttonClean || e.getSource() == buttonSave || e.getSource() == buttonRefresh) {
+        if (e.getSource() == buttonLoad || e.getSource() == buttonClean || e.getSource() == buttonSave || e.getSource() == buttonRefresh || e.getSource() == buttonFileChooser) {
             if (e.getSource() == buttonLoad) {
-                BDeserializer<Integer> load = new BDeserializer<Integer>();
+                BDeserializer<Integer> load = new BDeserializer<>();
                 bInt = load.getArbre(txtFile.getText());
                 if (bInt == null)
                     System.out.println("Echec du chargement.");
@@ -36,15 +37,32 @@ public class GUI extends JFrame implements ActionListener {
                 if (Integer.parseInt(txtU.getText()) < 2)
                     System.out.println("Impossible de cr?er un arbre dont le nombre de cl?s est inf?rieur ? 2.");
                 else
-                    bInt = new BTreePlus<Integer>(Integer.parseInt(txtU.getText()), testInt);
+                    try {
+                        bInt = new BTreePlus<>(Integer.parseInt(txtU.getText()), testInt);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
             } else if (e.getSource() == buttonSave) {
                 BSerializer<Integer> save = new BSerializer<Integer>(bInt, txtFile.getText());
-            }else if (e.getSource() == buttonRefresh) {
+            } else if (e.getSource() == buttonRefresh) {
                 tree.updateUI();
+            } else if (e.getSource() == buttonFileChooser) {
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File csv = fileChooser.getSelectedFile();
+                    try {
+                        this.bInt = new BTreePlus<>(Integer.parseInt(txtU.getText()), testInt, csv);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
         } else {
             if (bInt == null)
-                bInt = new BTreePlus<Integer>(Integer.parseInt(txtU.getText()), testInt);
+                try {
+                    bInt = new BTreePlus<>(Integer.parseInt(txtU.getText()), testInt);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
 
             if (e.getSource() == buttonAddMany) {
                 for (int i = 0; i < Integer.parseInt(txtNbreItem.getText()); i++) {
@@ -76,11 +94,13 @@ public class GUI extends JFrame implements ActionListener {
             }
         }
 
-        tree.setModel(new DefaultTreeModel(bInt.bArbreToJTree()));
-        for (int i = 0; i < tree.getRowCount(); i++)
-            tree.expandRow(i);
+        if (tree != null && this.bInt != null) {
+            tree.setModel(new DefaultTreeModel(bInt.bArbreToJTree()));
+            for (int i = 0; i < tree.getRowCount(); i++)
+                tree.expandRow(i);
 
-        tree.updateUI();
+            tree.updateUI();
+        }
     }
 
     private void build() {
@@ -232,6 +252,10 @@ public class GUI extends JFrame implements ActionListener {
         c.gridx = 0;
         c.gridy = 9;
 
+        fileChooser = new JFileChooser();
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setFileFilter(new FileNameExtensionFilter("CSV", "csv"));
+
         JScrollPane scrollPane = new JScrollPane(tree);
         pane1.add(scrollPane, c);
 
@@ -244,6 +268,7 @@ public class GUI extends JFrame implements ActionListener {
         buttonLoad.addActionListener(this);
         buttonSave.addActionListener(this);
         buttonRemove.addActionListener(this);
+        buttonFileChooser.addActionListener(this);
         buttonClean.addActionListener(this);
         buttonRefresh.addActionListener(this);
 

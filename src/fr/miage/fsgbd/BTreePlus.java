@@ -1,6 +1,15 @@
 package fr.miage.fsgbd;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import fr.miage.fsgbd.Noeud.Indexation;
 
 
 /**
@@ -10,8 +19,24 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class BTreePlus<Type> implements java.io.Serializable {
     private Noeud<Type> racine;
 
-    public BTreePlus(int u, Executable e) {
-        racine = new Noeud<Type>(u, e, null);
+    private File csv;
+
+    public BTreePlus(int u, Executable e) throws Exception {
+        this(u, e, null);
+    }
+
+    public BTreePlus(int u, Executable e, File csv) throws Exception {
+        this.csv = csv;
+        if (csv != null) {
+            String fileName = csv.toString();
+            int indexExtension = fileName.lastIndexOf(".");
+            if (indexExtension > 0 && fileName.substring(indexExtension + 1).equals("csv")) {
+                //
+            } else {
+                throw new Exception("Is not a CSV file. Please choose a file with extension \".csv\".");
+            }
+        }
+        this.racine = new Noeud<Type>(u, e, null, this.csv);
     }
 
     public void afficheArbre() {
@@ -29,8 +54,8 @@ public class BTreePlus<Type> implements java.io.Serializable {
 
     private DefaultMutableTreeNode bArbreToJTree(Noeud<Type> root) {
         StringBuilder txt = new StringBuilder();
-        for (Type key : root.keys)
-            txt.append(key.toString()).append(" ");
+        for (Indexation key : root.keys)
+            txt.append(key.getIndex().toString()).append(" ");
 
         DefaultMutableTreeNode racine2 = new DefaultMutableTreeNode(txt.toString(), true);
         for (Noeud<Type> fil : root.fils)
