@@ -607,8 +607,8 @@ public class Noeud<Type> implements java.io.Serializable {
                 for (int h = 0; h < header.length; h++) {
                     map.put(header[h], datas[h]);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                return null;
             }
             return map;
         }
