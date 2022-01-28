@@ -3,6 +3,7 @@ package fr.miage.fsgbd;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.lang.ProcessBuilder.Redirect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
@@ -10,7 +11,6 @@ import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import fr.miage.fsgbd.Noeud.Indexation;
-
 
 /**
  * @author Galli Gregory, Mopolo Moke Gabriel
@@ -31,7 +31,21 @@ public class BTreePlus<Type> implements java.io.Serializable {
             String fileName = csv.toString();
             int indexExtension = fileName.lastIndexOf(".");
             if (indexExtension > 0 && fileName.substring(indexExtension + 1).equals("csv")) {
-                //
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(this.csv));
+                    String line;
+                    Property<Type> property = new Property<>();
+                    reader.readLine();
+                    while ((line = reader.readLine()) != null) {
+                        String[] datas = line.split(";");
+                        if (datas.length > 0) {
+                            String index = datas[0];
+                            this.addValeur(property.setValue(index));
+                        }
+                    }
+                } catch (Exception exception) {
+                    throw exception;
+                }
             } else {
                 throw new Exception("Is not a CSV file. Please choose a file with extension \".csv\".");
             }
@@ -64,7 +78,6 @@ public class BTreePlus<Type> implements java.io.Serializable {
         return racine2;
     }
 
-
     public boolean addValeur(Type valeur) {
         System.out.println("Ajout de la valeur : " + valeur.toString());
         if (racine.contient(valeur) == null) {
@@ -75,7 +88,6 @@ public class BTreePlus<Type> implements java.io.Serializable {
         }
         return false;
     }
-
 
     public void removeValeur(Type valeur) {
         System.out.println("Retrait de la valeur : " + valeur.toString());
