@@ -11,9 +11,4 @@ abstract class Property<T> {
     }
 
     public abstract T to(String value);
-
-    public static void main(String[] args) {
-        ConvertToGenericType<Integer> convert = new ConvertToGenericType<>();
-        System.out.println(convert.get("0").getClass().getSimpleName());
-    }
 }
