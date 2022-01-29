@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import fr.miage.fsgbd.Noeud.Indexation;
+import fr.miage.fsgbd.property.ConvertToGenericType;
 
 /**
  * @author Galli Gregory, Mopolo Moke Gabriel
@@ -31,16 +32,20 @@ public class BTreePlus<Type> implements java.io.Serializable {
             String fileName = csv.toString();
             int indexExtension = fileName.lastIndexOf(".");
             if (indexExtension > 0 && fileName.substring(indexExtension + 1).equals("csv")) {
+                this.racine = new Noeud<Type>(u, e, null, this.csv);
                 try {
                     BufferedReader reader = new BufferedReader(new FileReader(this.csv));
+                    ConvertToGenericType<Type> convertIndex = new ConvertToGenericType<>();
                     String line;
-                    Property<Type> property = new Property<>();
                     reader.readLine();
                     while ((line = reader.readLine()) != null) {
                         String[] datas = line.split(";");
                         if (datas.length > 0) {
-                            String index = datas[0];
-                            this.addValeur(property.setValue(index));
+                            String strIndex = datas[0];
+                            Type index;
+                            if ((index = convertIndex.get(strIndex)) != null) {
+                                this.addValeur(index);
+                            }
                         }
                     }
                 } catch (Exception exception) {
@@ -49,8 +54,9 @@ public class BTreePlus<Type> implements java.io.Serializable {
             } else {
                 throw new Exception("Is not a CSV file. Please choose a file with extension \".csv\".");
             }
+        } else {
+            this.racine = new Noeud<>(u, e, null);
         }
-        this.racine = new Noeud<Type>(u, e, null, this.csv);
     }
 
     public void afficheArbre() {
