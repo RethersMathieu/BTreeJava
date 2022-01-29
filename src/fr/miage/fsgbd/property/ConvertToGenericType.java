@@ -2,7 +2,12 @@ package fr.miage.fsgbd.property;
 
 public class ConvertToGenericType<T> {
     private final Property<?>[] properties = {
-        new PropertyInt()
+        new PropertyInt(),
+        new PropertyString(),
+        new PropertyFloat(),
+        new PropertyDouble(),
+        new PropertyChar(),
+        new PropertyBool()
     };
 
     public T get(String arg) {
