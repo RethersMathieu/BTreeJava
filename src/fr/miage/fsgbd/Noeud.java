@@ -10,9 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 
@@ -470,8 +473,8 @@ public class Noeud<Type> implements java.io.Serializable {
 
 
                 // On cr�e deux nouveaux noeuds
-                Noeud<Type> noeudGauche = new Noeud<>(u, compar, null);
-                Noeud<Type> noeudDroit = new Noeud<>(u, compar, null);
+                Noeud<Type> noeudGauche = new Noeud<>(u, compar, null, this.csv);
+                Noeud<Type> noeudDroit = new Noeud<>(u, compar, null, this.csv);
 
                 // On ins�re la valeur comme nouvelle clef du noeud courant
                 noeud.insert(nouvelleValeur);
@@ -519,7 +522,7 @@ public class Noeud<Type> implements java.io.Serializable {
                 // Enfin, si le noeud courant est la racine
                 if (noeud.parent == null) {
                     // On cr�e un nouveau noeud qui prendra sa place
-                    Noeud<Type> nouveauParent = new Noeud<>(u, compar, null);
+                    Noeud<Type> nouveauParent = new Noeud<>(u, compar, null, this.csv);
 
                     // Qui deviendra le parent des noeuds gauche et droit
                     nouveauParent.addNoeud(noeudGauche);
@@ -575,7 +578,6 @@ public class Noeud<Type> implements java.io.Serializable {
                     String line;
                     long i = 0;
                     
-                    line = reader.readLine();
                     while ((line = reader.readLine()) != null) {
                         String[] datas = line.split(";");
                         if (datas.length > 0 && datas[0].equals(index.toString())) {
@@ -599,18 +601,26 @@ public class Noeud<Type> implements java.io.Serializable {
         }
 
         public Map<String, String> getValues() {
-            HashMap<String, String> map =  new HashMap<>();
-            try (Stream<String> lines = Files.lines(Paths.get(csv.getAbsolutePath()))) {
-                String[] header = lines.findFirst().get().split(";");
-                String[] datas = lines.skip(this.pointerCSV-1).findFirst().get().split(";");
+            if (this.pointerCSV == null) return null;
+            try (Stream<String> lines = Files.lines(csv.toPath())) {
+                List<String> header = Arrays.asList((Files.lines(csv.toPath())).findFirst().get().toUpperCase().split(";"));
+                String[] datas = lines.skip(this.pointerCSV).findFirst().get().split(";");
 
-                for (int h = 0; h < header.length; h++) {
-                    map.put(header[h], datas[h]);
+                TreeMap<String, String> map =  new TreeMap<>(new Comparator<String>() {
+                    @Override
+                    public int compare(String s1, String s2) {
+                        return header.indexOf(s1) - header.indexOf(s2);
+                    }
+                });
+
+                for (String name : header) {
+                    map.put(name, datas[header.indexOf(name)]);
                 }
+
+                return map;
             } catch (Exception e) {
                 return null;
             }
-            return map;
         }
 
         @Override
