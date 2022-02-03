@@ -556,6 +556,31 @@ public class Noeud<Type> implements java.io.Serializable {
         return racine;
     }
 
+    public boolean isLeaf() {
+        return this.fils.isEmpty();
+    }
+
+    public Noeud<Type> getNextBrother() {
+        int indexNoeud = this.parent.fils.indexOf(this);
+        int lastIndex = this.parent.fils.size() - 1;
+        if (indexNoeud < lastIndex) return this.parent.fils.get(++indexNoeud);
+        return null;
+    }
+
+    private static <T> Noeud<T> firstLeaf(Noeud<T> noeud) {
+        if (!noeud.isLeaf()) return firstLeaf(noeud.fils.get(0));
+        return noeud;
+    }
+
+    public Noeud<Type> getNextLeaf() {
+        Noeud<Type> brother = this.getNextBrother();
+        while(brother == null) {
+            if (this.parent == null) return null;
+            brother = this.parent.getNextBrother();
+        }
+        return firstLeaf(brother);
+    }
+
     public Indexation getIndexationOfNoeud(Type index) {
         for (Indexation indexation : this.keys) {
             if (indexation.index == index) {
@@ -626,6 +651,38 @@ public class Noeud<Type> implements java.io.Serializable {
         @Override
         public String toString() {
             return this.index.toString();
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getEnclosingInstance().hashCode();
+            result = prime * result + ((index == null) ? 0 : index.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Indexation other = (Indexation) obj;
+            if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+                return false;
+            if (index == null) {
+                if (other.index != null)
+                    return false;
+            } else if (!index.equals(other.index))
+                return false;
+            return true;
+        }
+
+        private Noeud getEnclosingInstance() {
+            return Noeud.this;
         }
     }
 }
