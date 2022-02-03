@@ -561,22 +561,24 @@ public class Noeud<Type> implements java.io.Serializable {
     }
 
     public Noeud<Type> getNextBrother() {
+        if (this.parent == null) return null;
         int indexNoeud = this.parent.fils.indexOf(this);
         int lastIndex = this.parent.fils.size() - 1;
         if (indexNoeud < lastIndex) return this.parent.fils.get(++indexNoeud);
         return null;
     }
 
-    private static <T> Noeud<T> firstLeaf(Noeud<T> noeud) {
+    public static <T> Noeud<T> firstLeaf(Noeud<T> noeud) {
         if (!noeud.isLeaf()) return firstLeaf(noeud.fils.get(0));
         return noeud;
     }
 
     public Noeud<Type> getNextLeaf() {
         Noeud<Type> brother = this.getNextBrother();
+        Noeud<Type> parent = this.parent;
         while(brother == null) {
-            if (this.parent == null) return null;
-            brother = this.parent.getNextBrother();
+            if ((parent = parent.parent) == null) return null;
+            brother = parent.getNextBrother();
         }
         return firstLeaf(brother);
     }
@@ -590,6 +592,10 @@ public class Noeud<Type> implements java.io.Serializable {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return keys.toString();
+    }
     class Indexation {
 
         private Type index;

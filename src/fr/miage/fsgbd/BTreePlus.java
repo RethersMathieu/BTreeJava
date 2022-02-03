@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.lang.ProcessBuilder.Redirect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -102,5 +104,15 @@ public class BTreePlus<Type> implements java.io.Serializable {
             if (racine != newRacine)
                 racine = newRacine;
         }
+    }
+
+    public Collection<Noeud<Type>> getLeafs() {
+        Noeud<Type> noeud = Noeud.firstLeaf(this.racine);
+        Collection<Noeud<Type>> leafs = new ArrayList<>();
+        leafs.add(noeud);
+        while((noeud = noeud.getNextLeaf()) != null) {
+            leafs.add(noeud);
+        }
+        return leafs;
     }
 }
