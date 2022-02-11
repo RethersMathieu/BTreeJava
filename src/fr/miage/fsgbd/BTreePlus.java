@@ -115,4 +115,9 @@ public class BTreePlus<Type> implements java.io.Serializable {
         }
         return leafs;
     }
+
+    public Indexation search(Type index) {
+        if (this.racine == null) return null;
+        return this.racine.getByIndex(index);
+    }
 }

@@ -560,25 +560,17 @@ public class Noeud<Type> implements java.io.Serializable {
         return this.fils.isEmpty();
     }
 
-    public Noeud<Type> getNextBrother() {
-        if (this.parent == null) return null;
-        int indexNoeud = this.parent.fils.indexOf(this);
-        int lastIndex = this.parent.fils.size() - 1;
-        if (indexNoeud < lastIndex) return this.parent.fils.get(++indexNoeud);
-        return null;
-    }
-
     public static <T> Noeud<T> firstLeaf(Noeud<T> noeud) {
         if (!noeud.isLeaf()) return firstLeaf(noeud.fils.get(0));
         return noeud;
     }
 
     public Noeud<Type> getNextLeaf() {
-        Noeud<Type> brother = this.getNextBrother();
+        Noeud<Type> brother = this.getNoeudSuivant();
         Noeud<Type> parent = this.parent;
         while(brother == null) {
             if ((parent = parent.parent) == null) return null;
-            brother = parent.getNextBrother();
+            brother = parent.getNoeudSuivant();
         }
         return firstLeaf(brother);
     }
@@ -590,6 +582,20 @@ public class Noeud<Type> implements java.io.Serializable {
             }
         }
         return null;
+    }
+
+    public Indexation getByIndex(Type index) {
+        if (index != null) return null;
+        int i = 0;
+        int max = this.keys.size();
+        Indexation indexation = null;
+        while (i < max && compare(index, (indexation = this.keys.get(i)).index)) {
+            i++;
+        }
+        if (index.equals(indexation.index)) return indexation;
+        else if (i >= max) return this.fils.get(i-1).getByIndex(index);
+        else if (isLeaf()) return null;
+        return this.fils.get(i).getByIndex(index);
     }
 
     @Override
