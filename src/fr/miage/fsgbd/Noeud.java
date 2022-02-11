@@ -73,7 +73,7 @@ public class Noeud<Type> implements java.io.Serializable {
     public Noeud<Type> contient(Type valeur) {
         Noeud<Type> retour = null;
 
-        if (this.keys.contains(valeur) && (this.fils.isEmpty())) {
+        if (this.keys.stream().anyMatch(indexation -> indexation.index.equals(valeur)) && (this.fils.isEmpty())) {
             retour = this;
         } else {
             Noeud<Type> trouve = null;
@@ -379,7 +379,7 @@ public class Noeud<Type> implements java.io.Serializable {
 
     public void remplacerDansParents(Noeud<Type> noeud, Type aRemplacer, Type remplacant)
     {
-        if (noeud.keys.contains(aRemplacer))
+        if (noeud.keys.stream().anyMatch(i -> i.index.equals(remplacant)))
         {
             noeud.keys.set(noeud.keys.indexOf(this.getIndexationOfNoeud(aRemplacer)), this.getIndexationOfNoeud(remplacant));
         }
@@ -466,7 +466,7 @@ public class Noeud<Type> implements java.io.Serializable {
         int tailleListe = noeud.keys.size();
 
         // On v�rifie que la valeur ne soit pas d�j� pr�sente dans l'arbre (juste au cas o�)
-        if (!noeud.keys.contains(nouvelleValeur)) {
+        if (!noeud.keys.stream().anyMatch(i -> i.index.equals(nouvelleValeur))) {
 
             // Si le nombre de clef du noeud courant est �gal au nom max d'�l�ments (2m)
             if (tailleListe >= u) {
