@@ -24,11 +24,11 @@ public class BTreePlus<Type> implements java.io.Serializable {
 
     private File csv;
 
-    public BTreePlus(int u, Executable e) throws Exception {
+    public BTreePlus(int u, Executable e) {
         this(u, e, null);
     }
 
-    public BTreePlus(int u, Executable e, File csv) throws Exception {
+    public BTreePlus(int u, Executable e, File csv) {
         this.csv = csv;
         if (csv != null) {
             String fileName = csv.toString();
@@ -51,10 +51,8 @@ public class BTreePlus<Type> implements java.io.Serializable {
                         }
                     }
                 } catch (Exception exception) {
-                    throw exception;
+                    exception.printStackTrace();
                 }
-            } else {
-                throw new Exception("Is not a CSV file. Please choose a file with extension \".csv\".");
             }
         } else {
             this.racine = new Noeud<>(u, e, null);
