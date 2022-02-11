@@ -51,6 +51,7 @@ public class GUI extends JFrame implements ActionListener {
                     File csv = fileChooser.getSelectedFile();
                     try {
                         this.bInt = new BTreePlus<>(Integer.parseInt(txtU.getText()), testInt, csv);
+                        System.out.println(this.bInt.search(7392).getValues());
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }

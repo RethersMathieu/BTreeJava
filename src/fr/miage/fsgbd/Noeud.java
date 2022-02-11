@@ -585,15 +585,15 @@ public class Noeud<Type> implements java.io.Serializable {
     }
 
     public Indexation getByIndex(Type index) {
-        if (index != null) return null;
+        if (index == null) return null;
         int i = 0;
         int max = this.keys.size();
         Indexation indexation = null;
-        while (i < max && compare(index, (indexation = this.keys.get(i)).index)) {
+        while (i < max && compare((indexation = this.keys.get(i)).index, index)) {
             i++;
         }
         if (index.equals(indexation.index)) return indexation;
-        else if (i >= max) return this.fils.get(i-1).getByIndex(index);
+        else if (i >= max) return this.fils.get(i).getByIndex(index);
         else if (isLeaf()) return null;
         return this.fils.get(i).getByIndex(index);
     }
